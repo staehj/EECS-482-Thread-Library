@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _MUTEX_IMPL_H
+#define _MUTEX_IMPL_H
+
 #include "mutex.h"
 
 class mutex::impl {
@@ -14,3 +16,5 @@ public:
 private:
 
 };
+
+#endif /* _MUTEX_IMPL_H */

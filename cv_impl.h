@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _CV_IMPL_H
+#define _CV_IMPL_H
+
 #include "cv.h"
 
 class cv::impl {
@@ -17,3 +19,5 @@ private:
 	// Add any private data members to implement this function
 
 };
+
+#endif /* _CV_IMPL_H */
