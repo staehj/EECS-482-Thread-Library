@@ -1,5 +1,4 @@
 #include "mutex.h"
-
 #include "mutex_impl.h"
 
 mutex::mutex() {

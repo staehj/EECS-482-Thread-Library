@@ -3,6 +3,9 @@
 
 #include "thread.h"
 
+#include <memory>
+#include <ucontext.h>
+
 class thread::impl {
 public:
 	impl();
@@ -12,7 +15,7 @@ public:
 	void impl_join();
 
 private:
-
+	std::shared_ptr<ucontext_t> waiting_thread;
 };
 
 #endif /* _THREAD_IMPL_H */
