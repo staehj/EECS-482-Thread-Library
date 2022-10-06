@@ -1,4 +1,7 @@
 #include "cpu.h"
+
+#include <ucontext.h>
+
 #include "cpu_impl.h"
 
 void cpu::init(thread_startfunc_t thread_func, void* param) {

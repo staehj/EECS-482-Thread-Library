@@ -1,4 +1,9 @@
-#pragma once
+#ifndef _CPU_IMPL_H
+#define _CPU_IMPL_H
+
+#include <queue>
+#include <ucontext.h>
+
 #include "cpu.h"
 
 class cpu::impl{
@@ -18,5 +23,7 @@ public:
 
 private:
 	// Add any private data members to implement this function
-
+    std::queue<ucontext_t*> ready_queue;
 };
+
+#endif /* _CPU_IMPL_H */
