@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdlib>
+
 #include "thread.h"
 
 using std::cout;
