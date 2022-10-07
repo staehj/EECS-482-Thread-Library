@@ -1,5 +1,6 @@
 #ifndef _THREAD_IMPL_H
 #define _THREAD_IMPL_H
+#define _XOPEN_SOURCE
 
 #include "thread.h"
 

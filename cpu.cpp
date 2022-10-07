@@ -1,3 +1,5 @@
+#define _XOPEN_SOURCE
+
 #include "cpu.h"
 #include "cpu_impl.h"
 

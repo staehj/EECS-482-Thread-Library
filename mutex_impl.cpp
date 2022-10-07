@@ -1,3 +1,5 @@
+#define _XOPEN_SOURCE
+
 #include "mutex_impl.h"
 
 mutex::impl::impl() {

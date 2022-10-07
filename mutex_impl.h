@@ -1,5 +1,6 @@
 #ifndef _MUTEX_IMPL_H
 #define _MUTEX_IMPL_H
+#define _XOPEN_SOURCE
 
 #include "mutex.h"
 

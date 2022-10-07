@@ -1,5 +1,6 @@
 #ifndef _CV_IMPL_H
 #define _CV_IMPL_H
+#define _XOPEN_SOURCE
 
 #include "cv.h"
 

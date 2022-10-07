@@ -1,3 +1,5 @@
+#define _XOPEN_SOURCE
+
 #include "thread.h"
 
 #include "cpu.h"

@@ -1,3 +1,5 @@
+#define _XOPEN_SOURCE
+
 #include "cpu_impl.h"
 
 cpu::impl::impl() {
