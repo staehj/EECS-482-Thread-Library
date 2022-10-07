@@ -5,6 +5,21 @@
 
 #include <ucontext.h>
 
-void cpu::init(thread_startfunc_t thread_func, void* param) {
-	this->impl_ptr->impl_init(thread_func, param);
+void impl_timer_interrupt_handler() {
+	// disable interrupts
+    // if !ready_queue.empty():
+        // add running_context to ready_queue
+        // retrive/pop context from ready_queue
+        // assign popped context as running_context
+        // set/start popped context
+    // enable interrupts
+}
+
+void cpu::init(thread_startfunc_t body, void* arg) {
+    // initialize interrupt vector
+    // interrupt_vector_table[IPI] not set intentionally
+    
+    interrupt_vector_table[TIMER] = impl_timer_interrupt_handler;
+    
+    impl_ptr->impl_init(body, arg);
 }

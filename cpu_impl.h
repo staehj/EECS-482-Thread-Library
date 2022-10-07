@@ -16,7 +16,7 @@ public:
 	~impl();
 
     // should this be static?
-    void thread_wrapper(/* thread_function, args */);
+    void thread_wrapper(thread_startfunc_t body, void* arg);
 
     // should this be static?
     void thread_exit();
