@@ -13,12 +13,15 @@ public:
 
 	~impl();
 
-	static context_wrapper set_up_context();
+	static std::unique_ptr<context_wrapper> set_up_context();
 
 	void impl_join();
 
 private:
-	std::unique_ptr<ucontext_t> waiting_thread;
+  // Note: can't track this here because thread object may be
+	// out of scope when stream of execution completes.
+	// Instead, we could track this in context_wrapper
+	// std::unique_ptr<ucontext_t> waiting_thread;
 };
 
 #endif /* _THREAD_IMPL_H */

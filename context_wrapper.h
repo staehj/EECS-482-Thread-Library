@@ -3,6 +3,7 @@
 #include <ucontext.h>
 
 struct context_wrapper {
-  ucontext_t context_ptr;
+  std::unique_ptr<context_wrapper> waiting_context;
+  ucontext_t* context_ptr;
   char* stack_base;
 };

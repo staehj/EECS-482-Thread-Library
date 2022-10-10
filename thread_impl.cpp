@@ -15,16 +15,16 @@ thread::impl::~impl() {
 
 }
 
-context_wrapper set_up_context() {
-    auto wrapper = std::make_unique<context_wrapper>;
-    ucontext_t *ucontext_ptr = new ucontext_t;
+std::unique_ptr<context_wrapper> set_up_context() {
+    auto wrapper = std::make_unique<context_wrapper>();
+    ucontext_t *new_ucontext_ptr = new ucontext_t;
     char *stack = new char [STACK_SIZE];
-    ucontext_ptr->uc_stack.ss_sp = stack;
-    ucontext_ptr->uc_stack.ss_size = STACK_SIZE;
-    ucontext_ptr->uc_stack.ss_flags = 0;
-    ucontext_ptr->uc_link = nullptr;
+    new_ucontext_ptr->uc_stack.ss_sp = stack;
+    new_ucontext_ptr->uc_stack.ss_size = STACK_SIZE;
+    new_ucontext_ptr->uc_stack.ss_flags = 0;
+    new_ucontext_ptr->uc_link = nullptr;
 
-    wrapper->context_ptr = ucontext_ptr;
+    wrapper->context_ptr = new_ucontext_ptr;
     wrapper->stack_base = stack;
     return wrapper;
 }
