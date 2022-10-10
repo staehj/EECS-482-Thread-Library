@@ -9,17 +9,19 @@
 #include <unordered_set>
 #include <ucontext.h>
 
+#include "context_wrapper.h"
+
 class cpu::impl{
 public:
 	impl();
 
 	~impl();
 
-    // should this be static?
-    void thread_wrapper(thread_startfunc_t body, void* arg);
+	// should this be static?
+	static void thread_wrapper(thread_startfunc_t body, void* arg);
 
-    // should this be static?
-    void thread_exit();
+	// should this be static?
+	static void thread_exit();
 
 	// Function for handling timer interrupts
 	void impl_timer_interrupt_handler();
@@ -32,10 +34,10 @@ public:
 
 private:
 	// Add any private data members to implement this function
-    std::queue<std::shared_ptr<ucontext_t>> ready_queue;
-    std::unordered_set<std::shared_ptr<ucontext_t>> waiting_set;
-    std::queue<std::shared_ptr<ucontext_t>> finished_queue;
-    std::shared_ptr<ucontext_t> running_context;
+	std::queue<context_wrapper> ready_queue;
+	std::unordered_set<context_wrapper> waiting_set;
+	std::queue<context_wrapper> finished_queue;
+	context_wrapper running_context;
 };
 
 #endif /* _CPU_IMPL_H */

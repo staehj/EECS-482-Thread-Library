@@ -17,9 +17,7 @@ void impl_timer_interrupt_handler() {
 
 void cpu::init(thread_startfunc_t body, void* arg) {
     // initialize interrupt vector
-    // interrupt_vector_table[IPI] not set intentionally
-    
-    interrupt_vector_table[TIMER] = impl_timer_interrupt_handler;
-    
+    interrupt_vector_table[TIMER] =  impl_timer_interrupt_handler;
+
     impl_ptr->impl_init(body, arg);
 }

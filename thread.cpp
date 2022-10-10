@@ -18,6 +18,9 @@ void thread::join() {
 	this->impl_ptr->impl_join();
 }
 
+// static function ~== class function (as opposed to member function)
+// member function is specific to a particular instance of the class (eg. join)
+// static/class function is not. it is called "on the classs" as whole
 void thread::yield() {
 	cpu::self()->impl_ptr->impl_thread_yield();
 }

@@ -13,10 +13,12 @@ public:
 
 	~impl();
 
+	static context_wrapper set_up_context();
+
 	void impl_join();
 
 private:
-	std::shared_ptr<ucontext_t> waiting_thread;
+	std::unique_ptr<ucontext_t> waiting_thread;
 };
 
 #endif /* _THREAD_IMPL_H */
