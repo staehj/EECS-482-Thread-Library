@@ -72,14 +72,15 @@ void cpu::impl::impl_timer_interrupt_handler() {
     // if ready queue is empty, we can stay on the current thread
     if (!ready_queue.empty()) {
         // add running_context to ready_queue
+        ucontext_t* temp = running_context->context_ptr;
         ready_queue.push(std::move(running_context));
 
         // retrive/pop context from ready_queue + assign as running_context
         running_context = std::move(ready_queue.front());
         ready_queue.pop();
 
-        // set/start popped context
-        setcontext(running_context->context_ptr);
+        // save current context and start new context
+        swapcontext(temp, running_context->context_ptr);
     }
 
     // enable interrupts
@@ -95,7 +96,8 @@ void cpu::impl::impl_thread_yield() {
 void cpu::impl::impl_init(thread_startfunc_t body, void* arg) {
     // TODO: initialize interrupt vector
     // interrupt_handler_t handler_func_ptr = (void(*)()) impl_timer_interrupt_handler;
-    cpu::self()->interrupt_vector_table[TIMER] = (void(*)()) impl_timer_interrupt_handler;
+    // cpu::self()->interrupt_vector_table[TIMER] = (void(*)()) impl_timer_interrupt_handler;
+    cpu::self()->interrupt_vector_table[TIMER] = impl_timer_interrupt_handler;
 
     // wrap thread_func with thread_wrapper
     void (*wrapped_func_ptr)(thread_startfunc_t, void*);
