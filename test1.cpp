@@ -110,7 +110,6 @@ void request_thread(void* requester_in) {
 
 	// After reading every track in one file, change its state to LAST
 	REQUEST_NEXT[requester] = requester_thread_state::LAST;
-	disk_lock.unlock();
 }
 
 void initial_thread(void* unused_param) {
