@@ -24,7 +24,7 @@ public:
 	void thread_exit();
 
 	// Handle timer interrupt
-	void impl_timer_interrupt_handler();
+	static void impl_timer_interrupt_handler();
 
 	// Handle thread yield
 	void impl_thread_yield();
