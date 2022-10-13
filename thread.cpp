@@ -11,7 +11,7 @@ thread::thread(thread_startfunc_t thread_func, void* param) {
 }
 
 thread::~thread() {
-	delete impl_ptr; // TODO:???
+	delete impl_ptr;
 }
 
 void thread::join() {

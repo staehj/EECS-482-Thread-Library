@@ -9,6 +9,12 @@
 #include "cpu_impl.h"
 #include "shared.h"
 
+// ------------------------------
+// ------------------------------
+// TODO: write asserts everywhere
+// ------------------------------
+// ------------------------------
+
 thread::impl::impl(thread_startfunc_t thread_func, void* param) {
     // disable interrupts
     cpu::interrupt_disable();
