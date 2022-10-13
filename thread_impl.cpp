@@ -121,24 +121,23 @@ void thread::impl::thread_exit() {
     // add current/running context to finished_queue
     finished_queue.push(std::move(cpu::self()->impl_ptr->running_context));
 
-    // TODO: question: is it the responsibility of thread_exit to place the next ready thread as running?
-    // it is thread_exit's responsibility to set/swap to a new context?
-    // consider the invariants of thread_exit / thread_wrapper
+    // suspend cpu there are no more threads to run
+    if (ready_queue.empty()) {
+        cpu::interrupt_enable_suspend();
+    }
 
-    // // assign next ready as running
-    // if (!ready_queue.empty()) {
-
-    // }
-    // // suspend cpu there are no more threads to run
-    // else if () {
-
-    // }
+    // assign next ready as running
+    auto context = std::move(ready_queue.front());
+    ready_queue.pop();
+    cpu::self()->impl_ptr->running_context = std::move(context);
 
     // enable interrupts
     cpu::interrupt_enable();
+
+    // set/start running_context
+    setcontext(cpu::self()->impl_ptr->running_context->context_ptr);
 }
 
 void thread::impl::impl_thread_yield() {
-	// is this identical to impl_timer_interrupt_handler?
-    // consider edge cases and abstracting this function
+	// copy + paste code for interrupt_handler here
 }
