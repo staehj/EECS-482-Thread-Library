@@ -7,7 +7,9 @@
 #include <memory>
 #include <queue>
 #include <ucontext.h>
+
 #include "shared.h"
+
 
 class thread::impl {
 public:
@@ -27,7 +29,6 @@ public:
 
 private:
   std::queue<std::unique_ptr<context_wrapper>> waiting_queue;
-	int id;
 };
 
 #endif /* _THREAD_IMPL_H */

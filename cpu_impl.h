@@ -4,12 +4,14 @@
 
 #include "cpu.h"
 
+#include <cassert>
 #include <memory>
 #include <queue>
 #include <unordered_set>
 #include <ucontext.h>
 
 #include "shared.h"
+
 
 class cpu::impl{
 public:
@@ -18,7 +20,6 @@ public:
 
 	// Implementation for cpu::init
 	void impl_init(thread_startfunc_t, void*);
-
 
 	static std::unique_ptr<context_wrapper> running_context;
 

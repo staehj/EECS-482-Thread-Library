@@ -2,12 +2,14 @@
 
 #include "thread_impl.h"
 
+#include <cassert>
 #include <memory>
 #include <ucontext.h>
 
 #include "cpu.h"
 #include "cpu_impl.h"
 #include "shared.h"
+
 
 // ------------------------------
 // ------------------------------
@@ -35,7 +37,8 @@ thread::impl::impl(thread_startfunc_t thread_func, void* param) {
 }
 
 thread::impl::~impl() {
-    // i dont think this is needed
+    // ensure no thread attempts to join to this thread after it is deleted
+    assert(waiting_queue.empty());
 }
 
 std::unique_ptr<context_wrapper> set_up_context() {
@@ -55,8 +58,8 @@ std::unique_ptr<context_wrapper> set_up_context() {
 // Note, if A calls B.join(), then BOTH A and B thread objects must exist
 // So we do not have to worry about A or B thread objects being destroyed
 // eg. A calls B.join()
-// cpu::self()->running_context === A
-// B's context - how to reference?
+// A (context_wrapper) === cpu::self()->running_context
+// B (thread_impl)     === this
 void thread::impl::impl_join() {
     // disable interrupts
     cpu::interrupt_disable();
@@ -79,13 +82,13 @@ void thread::impl::impl_join() {
 // Wrapper for thread function to track completion of stream of execution
 void thread::impl::thread_wrapper(thread_startfunc_t body, void* arg) {
     // TODO: gain clarity on interrupts here
-    // enable interrupts
+    // enable interrupts (about to go to user code)
     cpu::interrupt_enable();
     
     // call thread_function
     (*body)(arg);
 
-    // disable interrupts
+    // disable interrupts (re-entering OS code)
     cpu::interrupt_disable();
 
     // call thread_exit
@@ -104,17 +107,12 @@ void thread::impl::thread_exit() {
         // delete stack associated with context
         delete[] context->stack_base;
 
-        // delete context_wrapper object
-        context.reset();  // TODO: is this equivalent to delete on a raw pointer?
-                          // or is the point of smart pointers that this happens automatically?
+        // Note: no need to delete context object because it is a smart pointer
     }
 
     // ensure waiting threads (due to join) are moved to ready queue
-    if (/* TODO */) {
+    while (!waiting_queue.empty()) {  // TODO: how to reference waiting_queue (of specific thread) within a static function?
         // remove waiting_thread from cpu waiting_set
-        // TODO: how to track waiting thread with unique pointers?
-        // In the current implementation, it seems there would be a u_ptr to the waiting thread
-        // in BOTH the waiting_set and running_context (context_wrapper).
 
         // add waiting_thread to cpu ready_queue
 
@@ -123,12 +121,21 @@ void thread::impl::thread_exit() {
     // add current/running context to finished_queue
     finished_queue.push(std::move(cpu::self()->impl_ptr->running_context));
 
+    // TODO: question: is it the responsibility of thread_exit to place the next ready thread as running?
+    // it is thread_exit's responsibility to set/swap to a new context?
+    // consider the invariants of thread_exit / thread_wrapper
+
+    // // assign next ready as running
+    // if (!ready_queue.empty()) {
+
+    // }
+    // // suspend cpu there are no more threads to run
+    // else if () {
+
+    // }
+
     // enable interrupts
     cpu::interrupt_enable();
-
-
-    // TODO: implement cpu suspend on some condition here
-    // when there are no threads available to be run
 }
 
 void thread::impl::impl_thread_yield() {

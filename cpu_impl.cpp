@@ -3,6 +3,11 @@
 #include "cpu.h"
 #include "cpu_impl.h"
 
+#include <cassert>
+#include <memory>
+#include <queue>
+#include <ucontext.h>
+
 #include "shared.h"
 #include "thread_impl.h"
 
