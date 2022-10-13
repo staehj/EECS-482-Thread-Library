@@ -11,9 +11,7 @@ struct context_wrapper {
   char* stack_base;
   int id;
 
-  context_wrapper() : id(unique_id) {
-    unique_id++;
-  }
+  context_wrapper(int input_id) : id(input_id) {}
 };
 
 extern std::queue<std::unique_ptr<context_wrapper>> ready_queue;
