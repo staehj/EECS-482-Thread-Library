@@ -70,6 +70,7 @@
     "utility": "cpp",
     "fstream": "cpp",
     "iomanip": "cpp",
-    "stack": "cpp"
+    "stack": "cpp",
+    "cassert": "cpp"
   }
 }

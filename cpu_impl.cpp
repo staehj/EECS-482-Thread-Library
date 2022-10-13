@@ -35,6 +35,7 @@ void cpu::impl::impl_init(thread_startfunc_t body, void* arg) {
     std::queue<std::unique_ptr<context_wrapper>> ready_queue;
     std::unordered_set<std::unique_ptr<context_wrapper>> waiting_set;
     std::queue<std::unique_ptr<context_wrapper>> finished_queue;
+    int unique_id = 0;
 
     // initialize interrupt vector
     cpu::self()->interrupt_vector_table[TIMER] = impl_timer_interrupt_handler;

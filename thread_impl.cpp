@@ -5,14 +5,31 @@
 #include <memory>
 #include <ucontext.h>
 
+#include "cpu.h"
+#include "cpu_impl.h"
 #include "shared.h"
 
-thread::impl::impl() {
-    // add thread context to cpu ready_queue
+thread::impl::impl(thread_startfunc_t thread_func, void* param) {
+    // disable interrupts
+    cpu::interrupt_disable();
+    
+    // wrap thread_func with thread_wrapper
+    void (*wrapped_func_ptr)(thread_startfunc_t, void*);
+    wrapped_func_ptr = thread::impl::thread_wrapper;
+
+    // make context with wrapper thread_func
+    auto context = std::move(thread::impl::set_up_context());
+    makecontext(context->context_ptr, (void (*)()) wrapped_func_ptr, 2, thread_func, param);
+
+    // add context to ready queue
+    ready_queue.push(context);
+
+    // enable interrupts
+    cpu::interrupt_enable();
 }
 
 thread::impl::~impl() {
-
+    // i dont think this is needed
 }
 
 std::unique_ptr<context_wrapper> set_up_context() {
@@ -31,25 +48,35 @@ std::unique_ptr<context_wrapper> set_up_context() {
 
 // Note, if A calls B.join(), then BOTH A and B thread objects must exist
 // So we do not have to worry about A or B thread objects being destroyed
+// eg. A calls B.join()
+// cpu::self()->running_context === A
+// B's context - how to reference?
 void thread::impl::impl_join() {
-    // set current(/calling) context as waiting_thread of called thread
+    // add current(/calling) context to waiting_queue of called thread
+
         // eg. if A calls B.join --> A is calling thread, B is called thread
     // put calling context into cpu waiting_set
 }
+
 // Wrapper for thread function to track completion of stream of execution
 void thread::impl::thread_wrapper(thread_startfunc_t body, void* arg) {
+    // TODO: gain clarity on interrupts here
+    // enable interrupts
+    cpu::interrupt_enable();
+    
     // call thread_function
     (*body)(arg);
+
+    // disable interrupts
+    cpu::interrupt_disable();
 
     // call thread_exit
     thread_exit();
 }
 
 // Called after completion of stream of execution
+// ASSUMES interrupts are disabled
 void thread::impl::thread_exit() {
-    // disable interrupts
-    cpu::interrupt_disable();
-
     // clear cpu finished_queue (must delete stack + context_wrapper)
     while (!finished_queue.empty()) {
         // retrive context from finished queue
@@ -65,9 +92,8 @@ void thread::impl::thread_exit() {
     }
 
     // ensure waiting threads (due to join) are moved to ready queue
-    if (running_context->waiting_context != nullptr) {
+    if (/* TODO */) {
         // remove waiting_thread from cpu waiting_set
-        waiting_set.erase(running_context->waiting_context);
         // TODO: how to track waiting thread with unique pointers?
         // In the current implementation, it seems there would be a u_ptr to the waiting thread
         // in BOTH the waiting_set and running_context (context_wrapper).
@@ -77,10 +103,14 @@ void thread::impl::thread_exit() {
     }
 
     // add current/running context to finished_queue
-    finished_queue.push(std::move(running_context));
+    finished_queue.push(std::move(cpu::self()->impl_ptr->running_context));
 
     // enable interrupts
     cpu::interrupt_enable();
+
+
+    // TODO: implement cpu suspend on some condition here
+    // when there are no threads available to be run
 }
 
 void thread::impl::impl_thread_yield() {

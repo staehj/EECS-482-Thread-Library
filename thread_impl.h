@@ -9,7 +9,7 @@
 
 class thread::impl {
 public:
-	impl();
+	impl(thread_startfunc_t thread_func, void* param);
 
 	~impl();
 
@@ -24,10 +24,7 @@ public:
 	static void impl_thread_yield();
 
 private:
-  // Note: can't track this here because thread object may be
-	// out of scope when stream of execution completes.
-	// Instead, we could track this in context_wrapper
-	// std::unique_ptr<ucontext_t> waiting_thread;
+	int id;
 };
 
 #endif /* _THREAD_IMPL_H */
