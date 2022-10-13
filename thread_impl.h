@@ -17,6 +17,12 @@ public:
 
 	void impl_join();
 
+	static void thread_exit();
+
+	static void thread_wrapper(thread_startfunc_t body, void* arg);
+
+	static void impl_thread_yield();
+
 private:
   // Note: can't track this here because thread object may be
 	// out of scope when stream of execution completes.

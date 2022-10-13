@@ -5,7 +5,7 @@
 #include <memory>
 #include <ucontext.h>
 
-#include "context_wrapper.h"
+#include "shared.h"
 
 thread::impl::impl() {
     // add thread context to cpu ready_queue
@@ -35,4 +35,55 @@ void thread::impl::impl_join() {
     // set current(/calling) context as waiting_thread of called thread
         // eg. if A calls B.join --> A is calling thread, B is called thread
     // put calling context into cpu waiting_set
+}
+// Wrapper for thread function to track completion of stream of execution
+void thread::impl::thread_wrapper(thread_startfunc_t body, void* arg) {
+    // call thread_function
+    (*body)(arg);
+
+    // call thread_exit
+    thread_exit();
+}
+
+// Called after completion of stream of execution
+void thread::impl::thread_exit() {
+    // disable interrupts
+    cpu::interrupt_disable();
+
+    // clear cpu finished_queue (must delete stack + context_wrapper)
+    while (!finished_queue.empty()) {
+        // retrive context from finished queue
+        auto context = std::move(finished_queue.front());
+        finished_queue.pop();
+
+        // delete stack associated with context
+        delete[] context->stack_base;
+
+        // delete context_wrapper object
+        context.reset();  // TODO: is this equivalent to delete on a raw pointer?
+                          // or is the point of smart pointers that this happens automatically?
+    }
+
+    // ensure waiting threads (due to join) are moved to ready queue
+    if (running_context->waiting_context != nullptr) {
+        // remove waiting_thread from cpu waiting_set
+        waiting_set.erase(running_context->waiting_context);
+        // TODO: how to track waiting thread with unique pointers?
+        // In the current implementation, it seems there would be a u_ptr to the waiting thread
+        // in BOTH the waiting_set and running_context (context_wrapper).
+
+        // add waiting_thread to cpu ready_queue
+
+    }
+
+    // add current/running context to finished_queue
+    finished_queue.push(std::move(running_context));
+
+    // enable interrupts
+    cpu::interrupt_enable();
+}
+
+void thread::impl::impl_thread_yield() {
+	// is this identical to impl_timer_interrupt_handler?
+    // consider edge cases and abstracting this function
 }
