@@ -7,7 +7,6 @@
 #include <ucontext.h>
 
 struct context_wrapper {
-  std::queue<std::unique_ptr<context_wrapper>> waiting_queue;
   ucontext_t* context_ptr;
   char* stack_base;
   int id;

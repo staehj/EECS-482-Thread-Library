@@ -33,7 +33,6 @@ void cpu::impl::impl_timer_interrupt_handler() {
 void cpu::impl::impl_init(thread_startfunc_t body, void* arg) {
     // Initialize global variables
     std::queue<std::unique_ptr<context_wrapper>> ready_queue;
-    std::unordered_set<std::unique_ptr<context_wrapper>> waiting_set;
     std::queue<std::unique_ptr<context_wrapper>> finished_queue;
     int unique_id = 0;
 

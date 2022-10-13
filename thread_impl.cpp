@@ -52,10 +52,22 @@ std::unique_ptr<context_wrapper> set_up_context() {
 // cpu::self()->running_context === A
 // B's context - how to reference?
 void thread::impl::impl_join() {
-    // add current(/calling) context to waiting_queue of called thread
+    // disable interrupts
+    cpu::interrupt_disable();
 
-        // eg. if A calls B.join --> A is calling thread, B is called thread
-    // put calling context into cpu waiting_set
+    // add current(/calling) context to waiting_queue of called thread
+    ucontext_t* temp = cpu::self()->impl_ptr->running_context->context_ptr;
+    waiting_queue.push(std::move(cpu::self()->impl_ptr->running_context));
+
+    // retrive/pop context from ready_queue + assign as running_context
+    cpu::self()->impl_ptr->running_context = std::move(ready_queue.front());
+    ready_queue.pop();
+
+    // save current context and start new context
+    swapcontext(temp, cpu::self()->impl_ptr->running_context->context_ptr);
+    
+    // enable interrupts
+    cpu::interrupt_enable();
 }
 
 // Wrapper for thread function to track completion of stream of execution

@@ -5,7 +5,9 @@
 #include "thread.h"
 
 #include <memory>
+#include <queue>
 #include <ucontext.h>
+#include "shared.h"
 
 class thread::impl {
 public:
@@ -24,6 +26,7 @@ public:
 	static void impl_thread_yield();
 
 private:
+  std::queue<std::unique_ptr<context_wrapper>> waiting_queue;
 	int id;
 };
 
