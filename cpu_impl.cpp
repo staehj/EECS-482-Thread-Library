@@ -7,6 +7,7 @@
 #include <ucontext.h>
 
 #include "shared.h"
+#include "thread.h"
 #include "thread_impl.h"
 
 
@@ -14,18 +15,21 @@ void cpu::impl::impl_timer_interrupt_handler() {
 	// disable interrupts
     cpu::interrupt_disable();
 
+    // shortcut for cpu::self()->impl_ptr
+    impl* cpu_self = cpu::self()->impl_ptr;
+
     // if ready queue is empty, we can stay on the current thread
     if (!ready_queue.empty()) {
         // add running_context to ready_queue
-        ucontext_t* temp = running_context->context_ptr;
-        ready_queue.push(std::move(running_context));
+        ucontext_t* temp = cpu_self->running_context->context_ptr;
+        ready_queue.push(std::move(cpu_self->running_context));
 
         // retrive/pop context from ready_queue + assign as running_context
-        running_context = std::move(ready_queue.front());
+        cpu_self->running_context = std::move(ready_queue.front());
         ready_queue.pop();
 
         // save current context and start new context
-        swapcontext(temp, running_context->context_ptr);
+        swapcontext(temp, cpu_self->running_context->context_ptr);
     }
 
     // enable interrupts
@@ -45,9 +49,12 @@ void cpu::impl::impl_init(thread_startfunc_t body, void* arg) {
     auto context = std::move(thread::impl::set_up_context());
     makecontext(context->context_ptr, (void (*)()) wrapped_func_ptr, 2, body, arg);
 
+    // shortcut for cpu::self()->impl_ptr
+    impl* cpu_self = cpu::self()->impl_ptr;
+
     // assign context as running_context
-    running_context = std::move(context);
+    cpu_self->running_context = std::move(context);
 
     // set/start context
-    setcontext(running_context->context_ptr);
+    setcontext(cpu_self->running_context->context_ptr);
 }

@@ -43,7 +43,7 @@ thread::impl::~impl() {
 
 }
 
-std::unique_ptr<context_wrapper> set_up_context() {
+std::unique_ptr<context_wrapper> thread::impl::set_up_context() {
     auto wrapper = std::make_unique<context_wrapper>(unique_id);
     ucontext_t *new_ucontext_ptr = new ucontext_t;
     char *stack = new char [STACK_SIZE];

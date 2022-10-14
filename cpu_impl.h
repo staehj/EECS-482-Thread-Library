@@ -20,7 +20,7 @@ public:
 	// Implementation for cpu::init
 	void impl_init(thread_startfunc_t, void*);
 
-	static std::unique_ptr<context_wrapper> running_context;
+	std::unique_ptr<context_wrapper> running_context;
 
 private:
 	// Add any private data members to implement this function
