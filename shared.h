@@ -13,6 +13,8 @@ struct context_wrapper {
   char* stack_base;
   int id;
 
+  context_wrapper() : context_ptr(nullptr), stack_base(nullptr), id(0) {}
+
   context_wrapper(int input_id):  id(input_id) {}
 };
 
