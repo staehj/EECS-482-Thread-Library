@@ -1,5 +1,3 @@
-#define _XOPEN_SOURCE
-
 #include "cpu.h"
 #include "cpu_impl.h"
 
@@ -39,6 +37,7 @@ void cpu::impl::impl_init(thread_startfunc_t body, void* arg) {
     // Initialize global variables
     std::queue<std::unique_ptr<context_wrapper>> ready_queue;
     std::queue<std::unique_ptr<context_wrapper>> finished_queue;
+    std::vector<thread::impl*> thread_vec;
     int unique_id = 0;
 
     // initialize interrupt vector
@@ -54,9 +53,6 @@ void cpu::impl::impl_init(thread_startfunc_t body, void* arg) {
 
     // assign context as running_context
     running_context = std::move(context);
-
-    // enable interrupts
-    cpu::interrupt_enable();
 
     // set/start context
     setcontext(running_context->context_ptr);

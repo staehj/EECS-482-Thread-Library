@@ -1,5 +1,3 @@
-#define _XOPEN_SOURCE
-
 #include "thread_impl.h"
 
 #include <cassert>
@@ -27,10 +25,13 @@ thread::impl::impl(thread_startfunc_t thread_func, void* param) {
 
     // make context with wrapper thread_func
     auto context = std::move(thread::impl::set_up_context());
+    id = unique_id;
+    thread_vec.push_back(this);
+    unique_id++;
     makecontext(context->context_ptr, (void (*)()) wrapped_func_ptr, 2, thread_func, param);
 
     // add context to ready queue
-    ready_queue.push(context);
+    ready_queue.push(std::move(context));
 
     // enable interrupts
     cpu::interrupt_enable();
@@ -39,6 +40,7 @@ thread::impl::impl(thread_startfunc_t thread_func, void* param) {
 thread::impl::~impl() {
     // ensure no thread attempts to join to this thread after it is deleted
     assert(waiting_queue.empty());
+
 }
 
 std::unique_ptr<context_wrapper> set_up_context() {
@@ -74,7 +76,7 @@ void thread::impl::impl_join() {
 
     // save current context and start new context
     swapcontext(temp, cpu::self()->impl_ptr->running_context->context_ptr);
-    
+
     // enable interrupts
     cpu::interrupt_enable();
 }
@@ -110,12 +112,16 @@ void thread::impl::thread_exit() {
         // Note: no need to delete context object because it is a smart pointer
     }
 
+    thread::impl* cur_thread = thread_vec[cpu::self()->impl_ptr->running_context->id];
+
     // ensure waiting threads (due to join) are moved to ready queue
-    while (!waiting_queue.empty()) {  // TODO: how to reference waiting_queue (of specific thread) within a static function?
-        // remove waiting_thread from cpu waiting_set
+    while (!cur_thread->waiting_queue.empty()) {
+        // remove waiting_thread from waiting_queue
+        auto context = std::move(cur_thread->waiting_queue.front());
+        cur_thread->waiting_queue.pop();
 
         // add waiting_thread to cpu ready_queue
-
+        ready_queue.push(std::move(context));
     }
 
     // add current/running context to finished_queue
@@ -130,9 +136,6 @@ void thread::impl::thread_exit() {
     auto context = std::move(ready_queue.front());
     ready_queue.pop();
     cpu::self()->impl_ptr->running_context = std::move(context);
-
-    // enable interrupts
-    cpu::interrupt_enable();
 
     // set/start running_context
     setcontext(cpu::self()->impl_ptr->running_context->context_ptr);

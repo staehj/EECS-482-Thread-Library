@@ -1,5 +1,3 @@
-#define _XOPEN_SOURCE
-
 #include "cv.h"
 #include "cv_impl.h"
 

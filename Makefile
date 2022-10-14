@@ -1,4 +1,10 @@
-CC=g++ -g -Wall -std=c++17
+ifeq (${shell uname},Darwin)
+	CC=g++ -g -Wall -std=c++17 -D_XOPEN_SOURCE
+	LIBCPU=libcpu_macos.o
+else
+	CC=g++ -g -Wall -std=c++17
+	LIBCPU=libcpu.o
+endif
 
 # List of source files for your thread library
 THREAD_SOURCES=cpu.cpp cpu_impl.cpp cv.cpp cv_impl.cpp mutex.cpp mutex_impl.cpp thread.cpp thread_impl.cpp
@@ -14,8 +20,7 @@ libthread.o: ${THREAD_OBJS}
 	ld -r -o $@ ${THREAD_OBJS}
 
 # Compile an application program
-# app: app.cpp libthread.o libcpu.o
-app: libthread.o libcpu.o
+app: test1.cpp libthread.o ${LIBCPU}
 	${CC} -o $@ $^ -ldl -pthread
 
 # Generic rules for compiling a source file to an object file
@@ -25,4 +30,4 @@ app: libthread.o libcpu.o
 	${CC} -c $<
 
 clean:
-	rm -f ${THREAD_OBJS} libthread.o app
+	rm -rf ${THREAD_OBJS} libthread.o app* core*

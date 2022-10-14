@@ -1,5 +1,3 @@
-#define _XOPEN_SOURCE
-
 #include "cv_impl.h"
 
 cv::impl::impl() {

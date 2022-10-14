@@ -19,7 +19,8 @@ void func(void *a) {
 	m.unlock();
 	cout << (char*)a << " done" << endl;
 }
-int main(void) {
+
+void initial_thread(void* unused ) {
 	thread tA(func, (void*)"A");
 	thread tB(func, (void*)"B");
 	thread tC(func, (void*)"C");
@@ -27,4 +28,8 @@ int main(void) {
 	thread tE(func, (void*)"E");
 	thread tF(func, (void*)"F");
 	thread tG(func, (void*)"G");
+}
+
+int main(void) {
+	cpu::boot(1, (thread_startfunc_t)initial_thread, (void*)100, false, false, 0);
 }

@@ -1,5 +1,3 @@
-#define _XOPEN_SOURCE
-
 #include "mutex.h"
 #include "mutex_impl.h"
 

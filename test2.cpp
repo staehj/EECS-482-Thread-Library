@@ -20,7 +20,11 @@ void func(void *a) {
 	cout << (char*)a << " done" << endl;
 }
 
-int main(void ) {
+void initial_thread(void* unused ) {
 	thread tA(func, (void*)"A");
 	thread tB(func, (void*)"B");
+}
+
+int main(void) {
+	cpu::boot(1, (thread_startfunc_t)initial_thread, (void*)100, false, false, 0);
 }

@@ -40,8 +40,11 @@ void funcB(void* param) {
 	thread::yield();
 }
 
-
-int main(void) {
+void initial_thread(void* unused ) {
 	thread tA(funcA, (void*)"A");
 	thread tB(funcB, (void*)"B");
+}
+
+int main(void) {
+	cpu::boot(1, (thread_startfunc_t)initial_thread, (void*)100, false, false, 0);
 }

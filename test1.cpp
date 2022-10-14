@@ -128,7 +128,7 @@ void initial_thread(void* unused_param) {
 	}
 }
 
-int main() {
+int main(void) {
 	// If file_count is smaller than given capacity, MAX_DISK_QUEUE = file_count
 	int commandline_cap = input_commandline_cap;
 	FILE_ALIVE = (int)disks.size();

@@ -1,6 +1,5 @@
 #ifndef _CPU_IMPL_H
 #define _CPU_IMPL_H
-#define _XOPEN_SOURCE
 
 #include "cpu.h"
 
